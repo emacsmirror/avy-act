@@ -39,6 +39,8 @@
 
 ;; The commands that are applied in extended functions can be chosen through keyboard shortcuts as they are in the current buffer, or through the avy-selection-command-map. When using avy-act-on-position or avy-act-on-position-word-1, often either a whitespace is missing or one too much remains is at the position where the action was performed. For this, another command can be applied to that position from the avy-post-action-map, which by default contains commands to insert a whitespace or delete a character.
 
+;; The default keys are chosen to be in line with the Daselt layout for which it was developed (https://gitlab.com/nameiwillforget/daselt). If you find them unfitting, remap them.
+
 ;;; Code:
 (require 'avy)
 (require 'back-button)
