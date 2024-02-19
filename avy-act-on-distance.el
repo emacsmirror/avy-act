@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024  Alexander Prähauser
 
 ;; Author: Alexander Prähauser <ahprae@protonmail.com>
-;; Package-Requires: ((avy 20230420.404) (back-button 20220827.1733))
+;; Package-Requires: ((avy "0.5.0") (back-button "0.6.8"))
 ;; Version: 1.0
 ;; Keywords: tools, convenience
 ;; URL: https://github.com/nameiwillforget/Avy-act-on-Distance
