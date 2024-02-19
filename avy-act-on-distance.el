@@ -6,7 +6,7 @@
 ;; Package-Requires: ((avy "0.5.0") (back-button "0.6.8"))
 ;; Version: 1.0
 ;; Keywords: tools, convenience
-;; URL: https://github.com/nameiwillforget/Avy-act-on-Distance
+;; URL: https://gitlab.com/nameiwillforget/avy-act-on-distance
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
