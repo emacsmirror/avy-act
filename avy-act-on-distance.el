@@ -78,65 +78,68 @@
   "e" #'er/mark-sentence
   "r" #'mark-line
   
-  "q" #'mark-paragraph)
+  "q" #'mark-paragraph
 
+  "." #'avy-act-mark-nothing
+  "b" #'avy-act-mark-character)
 
 (defvar-keymap avy-post-action-map
   :doc "Map of actions that can be taken post avy action commands like avy-act-by-same-function and avy-act-on-position."
   "C-," #'avy-act-delete-char-from-distance
-  "C-<SPC>" #'avy-act-insert-space-from-distance)
-
+  "<SPC>" #'avy-act-insert-space-from-distance)
 
 ;; Commands for marking
 (defun avy-act-mark-nothing ()
-  "This command does nothing."
+  "This command activates the mark."
   (interactive)
-  (call-interactively #'set-mark-command))
+  (activate-mark))
 
 (defun avy-act-mark-character ()
   "This command marks a character."
   (interactive)
-  (call-interactively #'set-mark-command)
+  (activate-mark)
   (forward-char))
-
-
 
 ;; Action commands
 (defun overwrite (string)
   "This command overwrites the marked region."
   (interactive "sOverwrite with: ")
-  (call-interactively #'backward-delete-char-untabify)
-  (insert string)
-  ;; (back-button-local-backward)
-  )
-
+  (if (not (= (region-beginning) (region-end)))
+      (call-interactively #'backward-delete-char-untabify))
+  (insert string))
 
 ;; Post action commands
 (defun avy-act-delete-char-from-distance ()
   "This command deletes a character at the position that was acted on."
   (interactive)
-  (back-button-local-forward)
-  (call-interactively #'delete-char)
-  (back-button-local-backward))
+  (push-mark)
+  (push-mark)
+  (back-button-local-backward)
+  (delete-char -1)
+  (back-button-local-forward))
 
 (defun avy-act-insert-space-from-distance ()
   "This command inserts a space at the position that was acted on."
   (interactive)
-  (back-button-local-forward)
+  (push-mark)
+  (push-mark)
+  (back-button-local-backward)
   (insert '" ")
-  (back-button-local-backward))
-
+  (call-interactively #'back-button-local-backward))
 
 ;; Commands opening links
 (defun avy-act--follow-or-open ()
   "This command follows or opens a link at point."
   (interactive)
   (cond ((derived-mode-p 'Info-mode)
-         ((derived-mode-p 'eww-mode)
-          (goto-char pos)
-          (goto-char pos)
-          (call-interactively #'push-button))
-         (t (org-open-at-point-global)))))
+         (call-interactively #'Info-follow-nearest-node))
+        ((derived-mode-p 'eww-mode)
+         (call-interactively #'eww-follow-link))
+        ((derived-mode-p 'help-mode)
+         (call-interactively #'push-button))
+        ((derived-mode-p 'dired-mode)
+         (call-interactively #'dired-find-file))
+        (t (org-open-at-point-global))))
 
 (defun avy-act--follow-or-open-new-buffer ()
   "This command follows or opens a link at point."
@@ -145,6 +148,8 @@
          (call-interactively #'Info-follow-nearest-node t))
         ((derived-mode-p 'eww-mode)
          (call-interactively #'eww-follow-link))
+        ((derived-mode-p 'dired-mode)
+         (call-interactively #'dired-display-file))
         (t (org-open-at-point-global))))
 
 (defun avy-follow ()
@@ -162,13 +167,13 @@
 
 ;; Commands for recentering
 (defun avy-recenter-middle-at-line ()
-  "This function calls avy-goto-line and recenters the buffer with that line in the middle. If its starting position is still on the screen, it returns to it."
-  (interactive)
-  (let ((pos (point)) (midtoend (/ (- (window-end) (window-start)) 2)))
-    (call-interactively #'avy-goto-line)
-    (call-interactively #'recenter-top-bottom)
-    (if (and (> pos (- (point) midtoend)) (< pos (+ (point) midtoend)))
-        (goto-char pos))))
+"This function calls avy-goto-line and recenters the buffer with that line in the middle. If its starting position is still on the screen, it returns to it."
+(interactive)
+(let ((pos (point)) (midtoend (/ (- (window-end) (window-start)) 2)))
+  (call-interactively #'avy-goto-line)
+  (call-interactively #'recenter-top-bottom)
+  (if (and (> pos (- (point) midtoend)) (< pos (+ (point) midtoend)))
+      (goto-char pos))))
 
 (defun avy-recenter-top-at-line ()
   "This function calls avy-goto-line, recenters the buffer with that line at the top. 
