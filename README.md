@@ -7,7 +7,7 @@ The commands `avy-recenter-middle-at-line`, `avy-recenter-top-at-line` and
 `avy-recenter-bottom-at-line`, which allow recentering at a line.
 
 Extended functions, which allow you to do simple editing from a distance. These can be
-subdivided into four sub-classes:
+subdivided into three sub-classes:
 
 The commands `avy-act-on-position` and `avy-act-on-position-word-1`, which act by selecting
 a position in the buffer through Avy, then apply a marking command like `mark-word` or
