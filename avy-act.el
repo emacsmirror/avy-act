@@ -42,7 +42,7 @@
 ;; marking a region through either two avy functions or the same function applied twice,
 ;; then act on that region by applying a command.
 
-;; The commands avy-act-to-point and `avy-act-to-point-in-same-line', which mark a region up
+;; The commands `avy-act-to-point' and `avy-act-to-point-in-same-line', which mark a region up
 ;; to the current position of point using one avy command, then apply a command to that
 ;; region.
 
