@@ -34,4 +34,4 @@ For now, just clone `avy-act` into `~/.emacs.d/site-lisp/` and add
 ```
 (add-to-list `load-path (expand-file-name "site-lisp/avy-act/" user-emacs-directory))
 ```
-to your init. Adapt to your local setup if you are using different categories.
+to your init. Adapt to your local setup if you are using different folders.
