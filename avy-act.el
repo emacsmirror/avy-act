@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; These commands let Avy act from a distance. There are four basic classes:
+;; These commands let Avy act from a distance. There are three basic classes:
 
 ;; The commands `avy-act-follow' and `avy-act-follow-in-new-buffer', which allow you to select
 ;; a link to follow.

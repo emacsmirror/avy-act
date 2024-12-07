@@ -1,4 +1,4 @@
-These commands let Avy act from a distance. There are four basic classes:
+These commands let Avy act from a distance. There are three basic classes:
 
 The commands `avy-act-follow` and `avy-act-follow-in-new-buffer`, which allow you to select
 a link to follow.
@@ -28,3 +28,10 @@ is missing or one too much remains is at the position where the action was perfo
 For this, another command can be applied to that position from the
 `avy-act-post-action-map`, which by default contains commands to insert a whitespace or
 delete a character.
+
+# Installation
+For now, just clone `avy-act` into `~/.emacs.d/site-lisp/` and add 
+```
+(add-to-list `load-path (expand-file-name "site-lisp/avy-act/" user-emacs-directory))
+```
+to your init. Adapt to your local setup if you are using different categories.
