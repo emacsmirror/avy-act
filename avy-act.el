@@ -25,34 +25,36 @@
 
 ;; These commands let Avy act from a distance. There are three basic classes:
 
-;; The commands `avy-act-follow' and `avy-act-follow-in-new-buffer', which allow you to select
-;; a link to follow.
+;; The commands `avy-act-follow' and `avy-act-follow-in-new-buffer', which allow
+;; you to select a link to follow.
 
 ;; The commands `avy-recenter-middle-at-line', `avy-recenter-top-at-line' and
 ;; `avy-recenter-bottom-at-line', which allow recentering at a line.
 
-;; Extended functions, which allow you to do simple editing from a distance. These can be
-;; subdivided into three sub-classes:
+;; Extended functions, which allow you to do simple editing from a distance.
+;; These can be subdivided into three sub-classes:
 
-;; The commands `avy-act-on-position' and `avy-act-on-position-word-1', which act by selecting
-;; a position in the buffer through Avy, then apply a marking command like `mark-word' or
-;; `mark-sexp', then apply a command to the marked region.
-
-;; The commands `avy-act-on-region' and `avy-act-on-region-by-same-function', which act by
-;; marking a region through either two avy functions or the same function applied twice,
-;; then act on that region by applying a command.
-
-;; The commands `avy-act-to-point' and `avy-act-to-point-in-same-line', which mark a region up
-;; to the current position of point using one avy command, then apply a command to that
+;; The commands `avy-act-on-position' and `avy-act-on-position-word-1', which
+;; act by selecting a position in the buffer through Avy, then apply a marking
+;; command like `mark-word' or `mark-sexp', then apply a command to the marked
 ;; region.
 
-;; The commands that are applied in extended functions can be chosen through keyboard
-;; shortcuts as they are in the current buffer, or through the `avy-selection-command-map'.
-;; When using `avy-act-on-position' or `avy-act-on-position-word-1', often either a whitespace
-;; is missing or one too much remains is at the position where the action was performed.
-;; For this, another command can be applied to that position from the
-;; `avy-act-post-action-map', which by default contains commands to insert a whitespace or
-;; delete a character.
+;; The commands `avy-act-on-region' and `avy-act-on-region-by-same-function',
+;; which act by marking a region through either two avy functions or the same
+;; function applied twice, then act on that region by applying a command.
+
+;; The commands `avy-act-to-point' and `avy-act-to-point-in-same-line', which
+;; mark a region up to the current position of point using one avy command, then
+;; apply a command to that region.
+
+;; The commands that are applied in extended functions can be chosen through
+;; keyboard shortcuts as they are in the current buffer, or through the
+;; `avy-selection-command-map'. When using `avy-act-on-position' or
+;; `avy-act-on-position-word-1', often either a whitespace is missing or one too
+;; much remains is at the position where the action was performed. For this,
+;; another command can be applied to that position from the
+;; `avy-act-post-action-map', which by default contains commands to insert a
+;; whitespace or delete a character.
 
 ;;; Code:
 ;;;; Requirements
@@ -689,19 +691,17 @@ command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 delete whitespace) and return to POS."
   (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)))
-  (let ((markon visible-mark-mode))
-    (set-mark (point))
-    (call-interactively avy)
-    (call-interactively cmd)
-    (exchange-point-and-mark)
-    (unless markon (visible-mark-mode 0))
-    (setq-local avy-act-pos (point))
-    (setq avy-act-window (selected-window))
-    (setq avy-act-frame (selected-frame))
-    (set-transient-map avy-act-post-action-map)))
+  (set-mark (point))
+  (call-interactively avy)
+  (call-interactively cmd)
+  (exchange-point-and-mark)
+  (setq-local avy-act-pos (point))
+  (setq avy-act-window (selected-window))
+  (setq avy-act-frame (selected-frame))
+  (set-transient-map avy-act-post-action-map))
 
 (defun avy-act-to-point-in-same-line (cmd)
-  "Use Avy to act up to point in the current line.
+    "Use Avy to act up to point in the current line.
 
 Ask for a command CMD. Set the mark, use `avy-goto-char-in-line' to go to a
 position and call CMD. Return to the initial position POS.
@@ -717,8 +717,8 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)))
-  (avy-act-to-point cmd #'avy-goto-char-in-line))
+    (interactive (list (avy-act-selection-commands-help)))
+    (avy-act-to-point cmd #'avy-goto-char-in-line))
 
 (provide 'avy-act)
 ;;; avy-act.el ends here
