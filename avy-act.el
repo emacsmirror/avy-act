@@ -107,7 +107,7 @@
 
 ;;;; Customs
 (defcustom avy-act-recenter-at-cur-line-keys
-  (list (string-to-char (kbd "C-f")) (string-to-char (kbd "C-j")))
+  (list (string-to-char (kbd "C-d")) (string-to-char (kbd "C-k")))
   "List of recenter key combinations for avy-act-recenter commands.
 Typing one of these causes a command to recenter with the line point is on at
 the top, middle or bottom."
