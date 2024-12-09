@@ -364,6 +364,9 @@ If a prefix ARG is given, delete the character after."
            (call-interactively #'eww-open-in-new-buffer)))
         ((derived-mode-p 'dired-mode)
          (call-interactively #'dired-display-file))
+        ((derived-mode-p 'help-mode)
+         (progn (clone-buffer)
+                (call-interactively #'push-button)))
         (t (progn (org-open-at-point-global)))))
 
 (defun avy-act-follow ()
@@ -555,11 +558,12 @@ delete whitespace) and return to POS."
                   (goto-char (+ pos (- (point-max) buflength)))
                 (goto-char pos))
             (select-window window))
-        (select-frame frame)))
+        (select-frame frame))
+      )
     (set-transient-map avy-act-post-action-map)))
 
 (defun avy-act-on-position-word-1 (cmd size)
-  "Use Avy to act on a position chosen by `avy-goto-word-1'.
+    "Use Avy to act on a position chosen by `avy-goto-word-1'.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-word-1' to choose a
@@ -577,9 +581,9 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+    (interactive (list (avy-act-selection-commands-help)
                      (avy-act-position-selection-help)))
-  (avy-act-on-position cmd #'avy-goto-word-1 size))
+    (avy-act-on-position cmd #'avy-goto-word-1 size))
 
 (defun avy-act-on-position-in-line (cmd size)
                         "Use Avy to act on a position in the current line.
