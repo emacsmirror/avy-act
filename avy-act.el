@@ -582,7 +582,7 @@ delete whitespace) and return to POS."
   (avy-act-on-position cmd #'avy-goto-word-1 size))
 
 (defun avy-act-on-position-in-line (cmd size)
-  "Use Avy to act on a position in the current line.
+                        "Use Avy to act on a position in the current line.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-char-in-line' to choose a
@@ -600,12 +600,13 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+                        (interactive (list (avy-act-selection-commands-help)
                      (avy-act-position-selection-help)))
-  (avy-act-on-position cmd #'avy-goto-char-in-line size))
+                        (avy-act-on-position cmd #'avy-goto-char-in-line size))
 
+;;;;;; Region commands
 (defun avy-act-on-region (cmd avy1 avy2)
-  "Use Avy to act on a region.
+          "Use Avy to act on a region.
 
 Ask for a command CMD and two avy-functions AVY1 and AVY2 chosen by
 `avy-act-function-map'. Use AVY1 to go to a position, set the mark, use AVY2 to
@@ -622,10 +623,10 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+          (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)
                      (avy-act-functions-help)))
-  (let ((window (selected-window))
+          (let ((window (selected-window))
         (frame (selected-frame))
         (pos (point))
         (buflength (point-max)))
@@ -639,16 +640,16 @@ delete whitespace) and return to POS."
       (setq avy-act-window (selected-window))
       (setq avy-act-frame (selected-frame))
       (if (equal frame (selected-frame))
-          (if (equal window (selected-window))
-              (if (and (< newpos1 pos)) ; Calculate new region for changes before point
-                  (goto-char (+ pos (- (point-max) buflength)))
-                (goto-char pos))
+                          (if (equal window (selected-window))
+                              (if (and (< newpos1 pos)) ; Calculate new region for changes before point
+                                  (goto-char (+ pos (- (point-max) buflength)))
+                        (goto-char pos))
             (select-window window))
         (select-frame frame)))
     (set-transient-map avy-act-post-action-map)))
 
 (defun avy-act-on-region-by-same-function (cmd avy)
-  "Use Avy to act on a region.
+                        "Use Avy to act on a region.
 
 Ask for a command CMD and an avy-function AVY chosen by
 `avy-act-function-map'. Use AVY to go to a position, set the mark, use AVY to
@@ -665,14 +666,15 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+                        (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)))
-  (avy-act-on-region cmd avy avy))
+                        (avy-act-on-region cmd avy avy))
 
 
 
+;;;;;; Act-to-point commands
 (defun avy-act-to-point (cmd avy)
-  "Use Avy to act up to point.
+            "Use Avy to act up to point.
 
 Ask for a command CMD and an avy-function AVY chosen by `avy-act-function-map'.
 Set the mark, use AVY to go to a position and call CMD. Return to the initial
@@ -689,16 +691,16 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+            (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)))
-  (set-mark (point))
-  (call-interactively avy)
-  (call-interactively cmd)
-  (exchange-point-and-mark)
-  (setq-local avy-act-pos (point))
-  (setq avy-act-window (selected-window))
-  (setq avy-act-frame (selected-frame))
-  (set-transient-map avy-act-post-action-map))
+            (set-mark (point))
+            (call-interactively avy)
+            (call-interactively cmd)
+            (exchange-point-and-mark)
+            (setq-local avy-act-pos (point))
+            (setq avy-act-window (selected-window))
+            (setq avy-act-frame (selected-frame))
+            (set-transient-map avy-act-post-action-map))
 
 (defun avy-act-to-point-in-same-line (cmd)
     "Use Avy to act up to point in the current line.
