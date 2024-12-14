@@ -424,7 +424,10 @@ avy selection, just recenter at current line."
         (let* ((avy-handler-old avy-handler-function)
                (avy-handler-function
                 (lambda (char)
-                  (if (cl-member char avy-act-recenter-at-cur-line-keys)
+                  (if (or (cl-member char avy-act-recenter-at-cur-line-keys)
+                          ;; To accomodate function keys.
+                          (cl-member (vector char) avy-act-recenter-at-cur-line-keys
+                                     :test #'equal))
                       (progn (if num
                                  (recenter-top-bottom num)
                                (recenter))
