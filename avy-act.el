@@ -60,19 +60,24 @@
 ;;;; Requirements
 (require 'avy)
 
+(require 'dired)
+(require 'eww)
+(require 'info)
+(require 'frame)
+
 ;;;; Keymaps
 (defvar-keymap avy-act-function-map
-  :doc "Map for choosing avy-functions in avy-act commands like
+                                                              :doc "Map for choosing avy-functions in avy-act commands like
   avy-select-by-same-function-and-apply and its variants."
-  "f" #'avy-goto-char-timer
-  "j" #'avy-goto-word-1
+                                                              "f" #'avy-goto-char-timer
+                                                              "j" #'avy-goto-word-1
 
-  "d" #'avy-goto-char-in-line
-  
-  "g" #'avy-goto-line
-  "h" #'avy-goto-end-of-line
+                                                              "d" #'avy-goto-char-in-line
+                                                              
+                                                              "g" #'avy-goto-line
+                                                              "h" #'avy-goto-end-of-line
 
-  "?" #'avy-act-functions-help)
+                                                              "?" #'avy-act-functions-help)
 
 
 (defvar-keymap avy-act-selection-command-map
@@ -109,23 +114,29 @@
 
 ;;;; Customs
 (defcustom avy-act-recenter-at-cur-line-keys
-  (list (string-to-char (kbd "C-d")) (string-to-char (kbd "C-k")))
-  "List of recenter key combinations for avy-act-recenter commands.
+                                    (list (string-to-char (kbd "C-d")) (string-to-char (kbd "C-k")))
+                                    "List of recenter key combinations for avy-act-recenter commands.
 Typing one of these causes a command to recenter with the line point is on at
 the top, middle or bottom."
-  :type '(list character)
-  :group 'convenience)
+                                    :type '(list character)
+                                    :group 'convenience)
+
+
+;;;; Variables
+(defvar avy-act-frame)
+(defvar avy-act-window)
+(defvar avy-act-pos)
 
 ;;;; Help screens
 ;;;;; Help screen functions and macros
 (defmacro avy-act-make-function-select-help-screen (fname help-line help-text helped-map
                                                           &optional buffer-name)
-  "A variant of `make-help-screen'.
+                                          "A variant of `make-help-screen'.
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
 arguments."
-  (declare (indent defun))
-  `(defun ,fname ()
+                                          (declare (indent defun))
+                                          `(defun ,fname ()
      "Help command."
      (interactive)
      (avy-act--function-select-help-screen ,help-line ,help-text ,helped-map ,buffer-name)))
@@ -494,7 +505,7 @@ to it.
 
 ARG acts the same way as for `avy-goto-line."
   (interactive "p")
-  (avy-act--recenter (lambda (pos pnt midtoline) (> pos pnt))
+  (avy-act--recenter (lambda (pos pnt _midtoline) (> pos pnt))
                      1
                      arg))
 
@@ -515,7 +526,7 @@ to it.
 
 ARG acts the same way as for `avy-goto-line."
   (interactive "p")
-  (avy-act--recenter (lambda (pos pnt midtoline) (< pos pnt))
+  (avy-act--recenter (lambda (pos pnt _midtoline) (< pos pnt))
                      -1
                      arg))
 
