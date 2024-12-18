@@ -67,17 +67,17 @@
 
 ;;;; Keymaps
 (defvar-keymap avy-act-function-map
-                                                              :doc "Map for choosing avy-functions in avy-act commands like
+  :doc "Map for choosing avy-functions in avy-act commands like
   avy-select-by-same-function-and-apply and its variants."
-                                                              "f" #'avy-goto-char-timer
-                                                              "j" #'avy-goto-word-1
+  "f" #'avy-goto-char-timer
+  "j" #'avy-goto-word-1
 
-                                                              "d" #'avy-goto-char-in-line
-                                                              
-                                                              "g" #'avy-goto-line
-                                                              "h" #'avy-goto-end-of-line
+  "d" #'avy-goto-char-in-line
+  
+  "g" #'avy-goto-line
+  "h" #'avy-goto-end-of-line
 
-                                                              "?" #'avy-act-functions-help)
+  "?" #'avy-act-functions-help)
 
 
 (defvar-keymap avy-act-selection-command-map
@@ -161,123 +161,122 @@ See `help--help-screen' for documentation of the arguments."
               (replace-match (help--key-description-fontified
                               (substring (this-command-keys) 0 -1))
                              t t help-screen)))
-      (unwind-protect
-          (prog1 (let ((minor-mode-map-alist nil))
-                   (setcdr local-map helped-map)
-                   (define-key local-map [t] #'undefined)
-                   ;; Make the scroll bar keep working normally.
-                   (define-key local-map [vertical-scroll-bar]
-                               (lookup-key global-map [vertical-scroll-bar]))
-                   (if three-step-help
-                       (progn
-                         (setq key (let ((overriding-local-map local-map))
-                                     (read-key-sequence nil)))
-                         ;; Make the HELP key translate to C-h.
-                         (if (lookup-key function-key-map key)
-                             (setq key (lookup-key function-key-map key)))
-                         (setq char (aref key 0)))
-                     (setq char ??))
-                   (when (or (eq char ??) (eq char help-char)
-                             (memq char help-event-list))
-                     (setq config (current-window-configuration))
-                     (pop-to-buffer (or buffer-name " *Metahelp*") nil t)
-                     (and (fboundp 'make-frame)
-                          (not (eq (window-frame)
-                                   prev-frame))
-                          (setq new-frame (window-frame)
-                                config nil))
-                     (setq buffer-read-only nil)
-                     (let ((inhibit-read-only t))
-                       (erase-buffer)
-                       (insert (substitute-command-keys help-screen)))
-                     (let ((minor-mode-map-alist new-minor-mode-map-alist))
-                       (help-mode)
-                       (variable-pitch-mode)
-                       (setq new-minor-mode-map-alist minor-mode-map-alist))
-                     (goto-char (point-min))
-                     (while (or (memq char (append help-event-list
-                                                   (cons help-char '( ?? ?\C-v ?\s ?\177 ?\M-v ?\S-\s
-                                                                      deletechar backspace vertical-scroll-bar
-                                                                      home end next prior up down))))
-                                (eq (car-safe char) 'switch-frame)
-                                (equal key "\M-v"))
-                       (condition-case nil
-                           (cond
-                            ((eq (car-safe char) 'switch-frame)
-                             (handle-switch-frame char))
-                            ((memq char '(?\C-v ?\s next end))
-                             (scroll-up))
-                            ((or (memq char '(?\177 ?\M-v ?\S-\s deletechar backspace prior home))
-                                 (equal key "\M-v"))
-                             (scroll-down))
-                            ((memq char '(down))
-                             (scroll-up 1))
-                            ((memq char '(up))
-                             (scroll-down 1)))
-                         (error nil))
-                       (let ((cursor-in-echo-area t)
-                             (overriding-local-map local-map))
-                         (frame-toggle-on-screen-keyboard (selected-frame) nil)
-                         (setq key (read-key-sequence
-                                    (format "Type one of listed options%s: "
-                                            (if (pos-visible-in-window-p
-                                                 (point-max))
-                                                ""
-                                              (concat  ", or "
-                                                       (help--key-description-fontified (kbd "<PageDown>"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "<PageUp>"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "SPC"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "DEL"))
-                                                       " to scroll")))
-                                    nil nil nil nil
-                                    ;; Disable ``text conversion''.  OS
-                                    ;; input methods might otherwise chose
-                                    ;; to insert user input directly into
-                                    ;; a buffer.
-                                    t)
-                               char (aref key 0)))
+      (prog1 (let ((minor-mode-map-alist nil))
+               (setcdr local-map helped-map)
+               (define-key local-map [t] #'undefined)
+               ;; Make the scroll bar keep working normally.
+               (define-key local-map [vertical-scroll-bar]
+                           (lookup-key global-map [vertical-scroll-bar]))
+               (if three-step-help
+                   (progn
+                     (setq key (let ((overriding-local-map local-map))
+                                 (read-key-sequence nil)))
+                     ;; Make the HELP key translate to C-h.
+                     (if (lookup-key function-key-map key)
+                         (setq key (lookup-key function-key-map key)))
+                     (setq char (aref key 0)))
+                 (setq char ??))
+               (when (or (eq char ??) (eq char help-char)
+                         (memq char help-event-list))
+                 (setq config (current-window-configuration))
+                 (pop-to-buffer (or buffer-name " *Metahelp*") nil t)
+                 (and (fboundp 'make-frame)
+                      (not (eq (window-frame)
+                               prev-frame))
+                      (setq new-frame (window-frame)
+                            config nil))
+                 (setq buffer-read-only nil)
+                 (let ((inhibit-read-only t))
+                   (erase-buffer)
+                   (insert (substitute-command-keys help-screen)))
+                 (let ((minor-mode-map-alist new-minor-mode-map-alist))
+                   (help-mode)
+                   (variable-pitch-mode)
+                   (setq new-minor-mode-map-alist minor-mode-map-alist))
+                 (goto-char (point-min))
+                 (while (or (memq char (append help-event-list
+                                               (cons help-char '( ?? ?\C-v ?\s ?\177 ?\M-v ?\S-\s
+                                                                  deletechar backspace vertical-scroll-bar
+                                                                  home end next prior up down))))
+                            (eq (car-safe char) 'switch-frame)
+                            (equal key "\M-v"))
+                   (condition-case nil
+                       (cond
+                        ((eq (car-safe char) 'switch-frame)
+                         (handle-switch-frame char))
+                        ((memq char '(?\C-v ?\s next end))
+                         (scroll-up))
+                        ((or (memq char '(?\177 ?\M-v ?\S-\s deletechar backspace prior home))
+                             (equal key "\M-v"))
+                         (scroll-down))
+                        ((memq char '(down))
+                         (scroll-up 1))
+                        ((memq char '(up))
+                         (scroll-down 1)))
+                     (error nil))
+                   (let ((cursor-in-echo-area t)
+                         (overriding-local-map local-map))
+                     (frame-toggle-on-screen-keyboard (selected-frame) nil)
+                     (setq key (read-key-sequence
+                                (format "Type one of listed options%s: "
+                                        (if (pos-visible-in-window-p
+                                             (point-max))
+                                            ""
+                                          (concat  ", or "
+                                                   (help--key-description-fontified (kbd "<PageDown>"))
+                                                   "/"
+                                                   (help--key-description-fontified (kbd "<PageUp>"))
+                                                   "/"
+                                                   (help--key-description-fontified (kbd "SPC"))
+                                                   "/"
+                                                   (help--key-description-fontified (kbd "DEL"))
+                                                   " to scroll")))
+                                nil nil nil nil
+                                ;; Disable ``text conversion''.  OS
+                                ;; input methods might otherwise chose
+                                ;; to insert user input directly into
+                                ;; a buffer.
+                                t)
+                           char (aref key 0)))
 
-                       ;; If this is a scroll bar command, just run it.
-                       (when (eq char 'vertical-scroll-bar)
-                         (command-execute (lookup-key local-map key) nil key))))
-                   ;; We don't need the prompt any more.
-                   (message "")
-                   ;; Mouse clicks are not part of the help feature,
-                   ;; so reexecute them in the standard environment.
-                   (if (listp char)
-                       (setq unread-command-events
-                             (cons char unread-command-events)
-                             config nil)
-                     (let ((defn (lookup-key local-map key)))
-                       (if defn
-                           (progn
-                             (when config
-                               (set-window-configuration config)
-                               (setq config nil))
-                             ;; Temporarily rebind `minor-mode-map-alist'
-                             ;; to `new-minor-mode-map-alist' (Bug#10454).
-                             (prog1
-                                 (let ((minor-mode-map-alist new-minor-mode-map-alist))
-                                   ;; Return the function name instead of calling it interactively
-                                   defn)
-                               (when new-frame
-                                 ;; Do not iconify the selected frame.
-                                 (unless (eq new-frame (selected-frame))
-                                   (iconify-frame new-frame))
-                                 (setq new-frame nil))))
-                         (unless (equal (key-description key) "C-g")
-                           (message (substitute-command-keys
-                                     (format "No help command is bound to `\\`%s''"
-                                             (key-description key))))
-                           (ding))))))
-            (progn (when config
-                     (set-window-configuration config))
-                   (when new-frame
-                     (iconify-frame new-frame))
-                   (setq minor-mode-map-alist new-minor-mode-map-alist)))))))
+                   ;; If this is a scroll bar command, just run it.
+                   (when (eq char 'vertical-scroll-bar)
+                     (command-execute (lookup-key local-map key) nil key))))
+               ;; We don't need the prompt any more.
+               (message "")
+               ;; Mouse clicks are not part of the help feature,
+               ;; so reexecute them in the standard environment.
+               (if (listp char)
+                   (setq unread-command-events
+                         (cons char unread-command-events)
+                         config nil)
+                 (let ((defn (lookup-key local-map key)))
+                   (if defn
+                       (progn
+                         (when config
+                           (set-window-configuration config)
+                           (setq config nil))
+                         ;; Temporarily rebind `minor-mode-map-alist'
+                         ;; to `new-minor-mode-map-alist' (Bug#10454).
+                         (prog1
+                             (let ((minor-mode-map-alist new-minor-mode-map-alist))
+                               ;; Return the function name instead of calling it interactively
+                               defn)
+                           (when new-frame
+                             ;; Do not iconify the selected frame.
+                             (unless (eq new-frame (selected-frame))
+                               (iconify-frame new-frame))
+                             (setq new-frame nil))))
+                     (unless (equal (key-description key) "C-g")
+                       (message (substitute-command-keys
+                                 (format "No help command is bound to `\\`%s''"
+                                         (key-description key))))
+                       (ding))))))
+        (progn (when config
+                 (set-window-configuration config))
+               (when new-frame
+                 (iconify-frame new-frame))
+               (setq minor-mode-map-alist new-minor-mode-map-alist))))))
 
 ;;;;; Avy-act help screens
 (avy-act-make-function-select-help-screen
@@ -556,28 +555,21 @@ delete whitespace) and return to POS."
                      (avy-act-functions-help)
                      (avy-act-position-selection-help)))
   (let ((window (selected-window))
-        (frame (selected-frame))
-        (pos (point))
-        (buflength (point-max)))
-    (call-interactively avy)
-    (let ((newpos (point)))
-      (call-interactively size)
-      (call-interactively cmd)
-      (setq-local avy-act-pos (point))
-      (setq avy-act-window (selected-window))
-      (setq avy-act-frame (selected-frame))
-      (if (equal frame (selected-frame))
-          (if (equal window (selected-window))
-              (if (< newpos pos) ; Calculate new position for changes before point.
-                  (goto-char (+ pos (- (point-max) buflength)))
-                (goto-char pos))
-            (select-window window))
-        (select-frame frame))
-      )
-    (set-transient-map avy-act-post-action-map)))
+        (frame (selected-frame)))
+    (save-excursion (unwind-protect
+                        (progn (call-interactively avy)
+                               (call-interactively size)
+                               (call-interactively cmd)
+                               (deactivate-mark)
+                               (setq-local avy-act-pos (point))
+                               (setq avy-act-window (selected-window))
+                               (setq avy-act-frame (selected-frame))
+                               (set-transient-map avy-act-post-action-map))
+                      (select-frame frame)
+                      (select-window window)))))
 
 (defun avy-act-on-position-word-1 (cmd size)
-    "Use Avy to act on a position chosen by `avy-goto-word-1'.
+                      "Use Avy to act on a position chosen by `avy-goto-word-1'.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-word-1' to choose a
@@ -595,12 +587,12 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-    (interactive (list (avy-act-selection-commands-help)
+                      (interactive (list (avy-act-selection-commands-help)
                      (avy-act-position-selection-help)))
-    (avy-act-on-position cmd #'avy-goto-word-1 size))
+                      (avy-act-on-position cmd #'avy-goto-word-1 size))
 
 (defun avy-act-on-position-in-line (cmd size)
-                        "Use Avy to act on a position in the current line.
+                                "Use Avy to act on a position in the current line.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-char-in-line' to choose a
@@ -618,13 +610,13 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-                        (interactive (list (avy-act-selection-commands-help)
+                                (interactive (list (avy-act-selection-commands-help)
                      (avy-act-position-selection-help)))
-                        (avy-act-on-position cmd #'avy-goto-char-in-line size))
+                                (avy-act-on-position cmd #'avy-goto-char-in-line size))
 
 ;;;;;; Region commands
 (defun avy-act-on-region (cmd avy1 avy2)
-          "Use Avy to act on a region.
+  "Use Avy to act on a region.
 
 Ask for a command CMD and two avy-functions AVY1 and AVY2 chosen by
 `avy-act-function-map'. Use AVY1 to go to a position, set the mark, use AVY2 to
@@ -641,29 +633,22 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-          (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)
                      (avy-act-functions-help)))
-          (let ((window (selected-window))
-        (frame (selected-frame))
-        (pos (point))
-        (buflength (point-max)))
-    (call-interactively avy1)
-    (set-mark (point))
-    (let ((newpos1 (point)))
-      (call-interactively avy2)
-      (call-interactively cmd)
-      (deactivate-mark)
-      (setq-local avy-act-pos (point))
-      (setq avy-act-window (selected-window))
-      (setq avy-act-frame (selected-frame))
-      (if (equal frame (selected-frame))
-                          (if (equal window (selected-window))
-                              (if (and (< newpos1 pos)) ; Calculate new region for changes before point
-                                  (goto-char (+ pos (- (point-max) buflength)))
-                        (goto-char pos))
-            (select-window window))
-        (select-frame frame)))
+  (let ((window (selected-window))
+        (frame (selected-frame)))
+    (save-excursion (unwind-protect
+                        (progn (call-interactively avy1)
+                               (set-mark (point))
+                               (call-interactively avy2)
+                               (call-interactively cmd)
+                               (deactivate-mark)
+                               (setq-local avy-act-pos (point))
+                               (setq avy-act-window (selected-window))
+                               (setq avy-act-frame (selected-frame)))
+                      (select-frame frame)
+                      (select-window window)))
     (set-transient-map avy-act-post-action-map)))
 
 (defun avy-act-on-region-by-same-function (cmd avy)
@@ -692,7 +677,7 @@ delete whitespace) and return to POS."
 
 ;;;;;; Act-to-point commands
 (defun avy-act-to-point (cmd avy)
-            "Use Avy to act up to point.
+  "Use Avy to act up to point.
 
 Ask for a command CMD and an avy-function AVY chosen by `avy-act-function-map'.
 Set the mark, use AVY to go to a position and call CMD. Return to the initial
@@ -709,16 +694,15 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-            (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (avy-act-selection-commands-help)
                      (avy-act-functions-help)))
-            (set-mark (point))
-            (call-interactively avy)
-            (call-interactively cmd)
-            (exchange-point-and-mark)
-            (setq-local avy-act-pos (point))
-            (setq avy-act-window (selected-window))
-            (setq avy-act-frame (selected-frame))
-            (set-transient-map avy-act-post-action-map))
+  (save-excursion (set-mark (point))
+                  (call-interactively avy)
+                  (call-interactively cmd)
+                  (setq-local avy-act-pos (point))
+                  (setq avy-act-window (selected-window))
+                  (setq avy-act-frame (selected-frame)))
+  (set-transient-map avy-act-post-action-map))
 
 (defun avy-act-to-point-in-same-line (cmd)
     "Use Avy to act up to point in the current line.
