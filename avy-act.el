@@ -129,160 +129,38 @@ the top, middle or bottom."
 
 ;;;; Help screens
 ;;;;; Help screen functions and macros
+(defun avy-act--prepare-keymap-for-avy-act-help-screen (map)
+  "Prepare MAP for inclusion in an avy-act help-screen.
+This means each command bound in MAP is converted into a function that throws an
+exit-catch returning the command's name.
+Might not work for all kinds of keymaps."
+  (mapcar (lambda (elt)
+            (if (consp elt)
+                (if (keymapp elt)
+                    (avy-act--prepare-keymap-for-avy-act-help-screen elt)
+                  (cons (car elt) `(lambda () (interactive) (throw 'exit ',(cdr elt)))))
+              elt))
+          map))
+
 (defmacro avy-act-make-function-select-help-screen (fname help-line help-text helped-map
                                                           &optional buffer-name)
-                                          "A variant of `make-help-screen'.
+  "A variant of `make-help-screen'.
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
 arguments."
-                                          (declare (indent defun))
-                                          `(defun ,fname ()
+  (declare (indent defun))
+  `(defun ,fname ()
      "Help command."
      (interactive)
-     (avy-act--function-select-help-screen ,help-line ,help-text ,helped-map ,buffer-name)))
-
-(defun avy-act--function-select-help-screen (help-line help-text helped-map buffer-name)
-  "Helper function for `avy-act-make-function-select-help-screen'.
-See `help--help-screen' for documentation of the arguments."
-  (let ((line-prompt (substitute-command-keys help-line))
-        (help-buffer-under-preparation t))
-    (when three-step-help
-      (message "%s" line-prompt))
-    (let* ((help-screen help-text)
-           ;; We bind overriding-local-map for very small
-           ;; sections, *excluding* where we switch buffers
-           ;; and where we execute the chosen help command.
-           (local-map (make-sparse-keymap))
-           (new-minor-mode-map-alist minor-mode-map-alist)
-           (prev-frame (selected-frame))
-           config new-frame key char)
-      (when (string-match "%THIS-KEY%" help-screen)
-        (setq help-screen
-              (replace-match (help--key-description-fontified
-                              (substring (this-command-keys) 0 -1))
-                             t t help-screen)))
-      (unwind-protect
-          (prog1 (let ((minor-mode-map-alist nil))
-                   (setcdr local-map helped-map)
-                   (define-key local-map [t] #'undefined)
-                   ;; Make the scroll bar keep working normally.
-                   (define-key local-map [vertical-scroll-bar]
-                               (lookup-key global-map [vertical-scroll-bar]))
-                   (if three-step-help
-                       (progn
-                         (setq key (let ((overriding-local-map local-map))
-                                     (read-key-sequence nil)))
-                         ;; Make the HELP key translate to C-h.
-                         (if (lookup-key function-key-map key)
-                             (setq key (lookup-key function-key-map key)))
-                         (setq char (aref key 0)))
-                     (setq char ??))
-                   (when (or (eq char ??) (eq char help-char)
-                             (memq char help-event-list))
-                     (setq config (current-window-configuration))
-                     (pop-to-buffer (or buffer-name " *Metahelp*") nil t)
-                     (and (fboundp 'make-frame)
-                          (not (eq (window-frame)
-                                   prev-frame))
-                          (setq new-frame (window-frame)
-                                config nil))
-                     (setq buffer-read-only nil)
-                     (let ((inhibit-read-only t))
-                       (erase-buffer)
-                       (insert (substitute-command-keys help-screen)))
-                     (let ((minor-mode-map-alist new-minor-mode-map-alist))
-                       (help-mode)
-                       (variable-pitch-mode)
-                       (setq new-minor-mode-map-alist minor-mode-map-alist))
-                     (goto-char (point-min))
-                     (while (or (memq char (append help-event-list
-                                                   (cons help-char '( ?? ?\C-v ?\s ?\177 ?\M-v ?\S-\s
-                                                                      deletechar backspace vertical-scroll-bar
-                                                                      home end next prior up down))))
-                                (eq (car-safe char) 'switch-frame)
-                                (equal key "\M-v"))
-                       (condition-case nil
-                           (cond
-                            ((eq (car-safe char) 'switch-frame)
-                             (handle-switch-frame char))
-                            ((memq char '(?\C-v ?\s next end))
-                             (scroll-up))
-                            ((or (memq char '(?\177 ?\M-v ?\S-\s deletechar backspace prior home))
-                                 (equal key "\M-v"))
-                             (scroll-down))
-                            ((memq char '(down))
-                             (scroll-up 1))
-                            ((memq char '(up))
-                             (scroll-down 1)))
-                         (error nil))
-                       (let ((cursor-in-echo-area t)
-                             (overriding-local-map local-map))
-                         (frame-toggle-on-screen-keyboard (selected-frame) nil)
-                         (setq key (read-key-sequence
-                                    (format "Type one of listed options%s: "
-                                            (if (pos-visible-in-window-p
-                                                 (point-max))
-                                                ""
-                                              (concat  ", or "
-                                                       (help--key-description-fontified (kbd "<PageDown>"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "<PageUp>"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "SPC"))
-                                                       "/"
-                                                       (help--key-description-fontified (kbd "DEL"))
-                                                       " to scroll")))
-                                    nil nil nil nil
-                                    ;; Disable ``text conversion''.  OS
-                                    ;; input methods might otherwise chose
-                                    ;; to insert user input directly into
-                                    ;; a buffer.
-                                    t)
-                               char (aref key 0)))
-
-                       ;; If this is a scroll bar command, just run it.
-                       (when (eq char 'vertical-scroll-bar)
-                         (command-execute (lookup-key local-map key) nil key))))
-                   ;; We don't need the prompt any more.
-                   (message "")
-                   ;; Mouse clicks are not part of the help feature,
-                   ;; so reexecute them in the standard environment.
-                   (if (listp char)
-                       (setq unread-command-events
-                             (cons char unread-command-events)
-                             config nil)
-                     (let ((defn (lookup-key local-map key)))
-                       (if defn
-                           (progn
-                             (when config
-                               (set-window-configuration config)
-                               (setq config nil))
-                             ;; Temporarily rebind `minor-mode-map-alist'
-                             ;; to `new-minor-mode-map-alist' (Bug#10454).
-                             (prog1
-                                 (let ((minor-mode-map-alist new-minor-mode-map-alist))
-                                   ;; Return the function name instead of calling it interactively
-                                   defn)
-                               (when new-frame
-                                 ;; Do not iconify the selected frame.
-                                 (unless (eq new-frame (selected-frame))
-                                   (iconify-frame new-frame))
-                                 (setq new-frame nil))))
-                         (unless (equal (key-description key) "C-g")
-                           (message (substitute-command-keys
-                                     (format "No help command is bound to `\\`%s''"
-                                             (key-description key))))
-                           (ding))))))
-            (progn (when config
-                     (set-window-configuration config))
-                   (when new-frame
-                     (iconify-frame new-frame))
-                   (setq minor-mode-map-alist new-minor-mode-map-alist)))))))
+     (catch 'exit (help--help-screen ,help-line ,help-text
+                                     (avy-act--prepare-keymap-for-avy-act-help-screen
+                                      ,helped-map)
+                                     ,buffer-name))))
 
 ;;;;; Avy-act help screens
 (avy-act-make-function-select-help-screen
   avy-act-functions-help "Function: (? for Help)"
-  (format "%s"  (substitute-command-keys "\\{avy-act-function-map}"))
+  (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
   avy-act-function-map)
 
 (avy-act-make-function-select-help-screen avy-act-selection-commands-help "Function: (? for Help)"
@@ -290,14 +168,14 @@ See `help--help-screen' for documentation of the arguments."
   (make-composed-keymap avy-act-selection-command-map (make-composed-keymap (current-active-maps t))))
 
 (avy-act-make-function-select-help-screen avy-act-position-selection-help "Function: (? for Help)"
-                                                        (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
-                                                        avy-act-position-selection-map)
+  (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
+  avy-act-position-selection-map)
 
 
 ;;;; Commands
 ;;;;; Commands for marking
 (defun avy-act-mark-nothing ()
-    "This command does nothing."
+  "This command does nothing."
   (interactive))
 
 (defun avy-act-mark-character ()
