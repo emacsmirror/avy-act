@@ -59,67 +59,67 @@
 ;;; Code:
 ;;;; Requirements
 (require 'avy)
-
 (require 'dired)
 (require 'eww)
 (require 'info)
 (require 'frame)
+(require 'help-macro)
 
 ;;;; Keymaps
-(defvar-keymap avy-act-function-map
-  :doc "Map for choosing avy-functions in avy-act commands like
+(eval-when-compile
+  (defvar-keymap avy-act-function-map
+    :doc "Map for choosing avy-functions in avy-act commands like
   avy-select-by-same-function-and-apply and its variants."
-  "f" #'avy-goto-char-timer
-  "j" #'avy-goto-word-1
+    "f" #'avy-goto-char-timer
+    "j" #'avy-goto-word-1
 
-  "d" #'avy-goto-char-in-line
-  
-  "g" #'avy-goto-line
-  "h" #'avy-goto-end-of-line
+    "d" #'avy-goto-char-in-line
+    
+    "g" #'avy-goto-line
+    "h" #'avy-goto-end-of-line
 
-  "?" #'avy-act-functions-help)
+    "?" #'avy-act-functions-help)
 
-
-(defvar-keymap avy-act-selection-command-map
-  :doc "Map of commands that act on a selection and are chosen by typing a letter in
+  (defvar-keymap avy-act-selection-command-map
+    :doc "Map of commands that act on a selection and are chosen by typing a letter in
   extended avy functions like act-by-same-function and its variants."
-  "e" #'delete-region
-  "c" #'kill-ring-save
+    "e" #'delete-region
+    "c" #'kill-ring-save
 
-  "k" #'kill-region
-  
-  "i" #'avy-act-overwrite
+    "k" #'kill-region
+    
+    "i" #'avy-act-overwrite
 
-  "y" #'yank
+    "y" #'yank
 
-  "?" #'avy-act-selection-commands-help)
+    "?" #'avy-act-selection-commands-help)
 
 
-(defvar-keymap avy-act-position-selection-map
-  :doc "Map of commands that act on a selection and are chosen by typing a letter in
+  (defvar-keymap avy-act-position-selection-map
+    :doc "Map of commands that act on a selection and are chosen by typing a letter in
   extended avy functions like act-by-same-function and its variants."
-  "f" #'mark-word
-  "j" #'mark-sexp
+    "f" #'mark-word
+    "j" #'mark-sexp
 
-  "d" #'mark-paragraph
+    "d" #'mark-paragraph
 
-  "v" #'avy-act-mark-nothing
-  "n" #'avy-act-mark-character)
+    "v" #'avy-act-mark-nothing
+    "n" #'avy-act-mark-character)
 
-(defvar-keymap avy-act-post-action-map
-  :doc "Map of actions that can be taken post avy action commands like
+  (defvar-keymap avy-act-post-action-map
+    :doc "Map of actions that can be taken post avy action commands like
   avy-act-by-same-function and avy-act-on-position."
-  "C-<backspace>" #'avy-act-delete-char-from-distance
-  "0" #'avy-act-insert-space-from-distance)
+    "C-<backspace>" #'avy-act-delete-char-from-distance
+    "0" #'avy-act-insert-space-from-distance))
 
 ;;;; Customs
 (defcustom avy-act-recenter-at-cur-line-keys
-                                    (list (string-to-char (kbd "C-d")) (string-to-char (kbd "C-k")))
-                                    "List of recenter key combinations for avy-act-recenter commands.
+                                              (list (string-to-char (kbd "C-d")) (string-to-char (kbd "C-k")))
+                                              "List of recenter key combinations for avy-act-recenter commands.
 Typing one of these causes a command to recenter with the line point is on at
 the top, middle or bottom."
-                                    :type '(list character)
-                                    :group 'convenience)
+                                              :type '(list character)
+                                              :group 'convenience)
 
 
 ;;;; Variables
@@ -129,21 +129,25 @@ the top, middle or bottom."
 
 ;;;; Help screens
 ;;;;; Help screen functions and macros
-(defun avy-act--prepare-keymap-for-avy-act-help-screen (map)
-  "Prepare MAP for inclusion in an avy-act help-screen.
+(eval-when-compile(defun avy-act--prepare-keymap-for-avy-act-help-screen (map)
+                    "Prepare MAP for inclusion in an avy-act help-screen.
 This means each command bound in MAP is converted into a function that throws an
 exit-catch returning the command's name.
 Might not work for all kinds of keymaps."
-  (mapcar (lambda (elt)
-            (if (consp elt)
-                (if (keymapp elt)
-                    (avy-act--prepare-keymap-for-avy-act-help-screen elt)
-                  (cons (car elt) `(lambda () (interactive) (throw 'exit ',(cdr elt)))))
-              elt))
-          map))
+                    (mapcar (lambda (elt)
+                              (if (consp elt)
+                                  (if (keymapp elt)
+                                      (avy-act--prepare-keymap-for-avy-act-help-screen elt)
+                                    (cons (car elt) `(lambda () (interactive) (throw 'exit ',(cdr elt)))))
+                                elt))
+                            map)))
 
-(defmacro avy-act-make-function-select-help-screen (fname help-line help-text helped-map
-                                                          &optional buffer-name)
+(defun avy-act-exit-function (fun) 
+  "Exit FUN with an exit catch around it."
+  (catch 'exit (funcall fun)))
+
+(defmacro avy-act-make-function-select-help-screen-30 (fname help-line help-text helped-map
+                                                             &optional buffer-name)
   "A variant of `make-help-screen'.
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
@@ -157,20 +161,57 @@ arguments."
                                       ,helped-map)
                                      ,buffer-name))))
 
-;;;;; Avy-act help screens
-(avy-act-make-function-select-help-screen
-  avy-act-functions-help "Function: (? for Help)"
-  (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
-  avy-act-function-map)
+(defmacro avy-act-make-function-select-help-screen-29 (fname help-line help-text helped-map
+                                                             &optional buffer-name)
+  "A variant of `make-help-screen'.
+There is only difference to the original macro: instead of calling a selected
+function it returns its name. See `make-help-screen' for an explanation of the
+arguments."
+  (declare (indent defun))
+  `(progn
+     (make-help-screen ,fname ,help-line ,help-text
+       ',(avy-act--prepare-keymap-for-avy-act-help-screen
+          (if (symbolp helped-map)
+              (symbol-value helped-map)
+            helped-map))
+       ,buffer-name)))
 
-(avy-act-make-function-select-help-screen avy-act-selection-commands-help "Function: (? for Help)"
-  (format "%s"  (substitute-command-keys "\\{avy-act-selection-command-map}"))
-  (make-composed-keymap avy-act-selection-command-map (make-composed-keymap (current-active-maps t))))
+(defalias 'avy-act-make-function-select-help-screen
+  (if t
+      'avy-act-make-function-select-help-screen-29
+    'avy-act-make-function-select-help-screen-30))
 
-(avy-act-make-function-select-help-screen avy-act-position-selection-help "Function: (? for Help)"
-  (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
-  avy-act-position-selection-map)
+(defun avy-act--make-help-screens ()
+  "Make help screens relevant to `avy-act'."
+  (if (< emacs-major-version 30)
+      (progn (avy-act-make-function-select-help-screen-29
+               avy-act-functions-help "Function: (? for Help)"
+               (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
+               avy-act-function-map)
 
+             (avy-act-make-function-select-help-screen-29 avy-act-selection-commands-help "Function: (? for Help)"
+               (format "%s"  (substitute-command-keys "\\{avy-act-selection-command-map}"))
+               avy-act-selection-command-map)
+
+             (avy-act-make-function-select-help-screen-29 avy-act-position-selection-help "Function: (? for Help)"
+               (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
+               avy-act-position-selection-map))
+    (avy-act-make-function-select-help-screen-30
+      avy-act-functions-help "Function: (? for Help)"
+      (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
+      avy-act-function-map)
+
+    (avy-act-make-function-select-help-screen-30 avy-act-selection-commands-help "Function: (? for Help)"
+      (format "%s"  (substitute-command-keys "\\{avy-act-selection-command-map}"))
+      (make-composed-keymap avy-act-selection-command-map (make-composed-keymap (current-active-maps t))))
+
+    (avy-act-make-function-select-help-screen-30 avy-act-position-selection-help "Function: (? for Help)"
+      (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
+      avy-act-position-selection-map))
+
+  (advice-add 'avy-act-functions-help :around #'avy-act-exit-function)
+  (advice-add 'avy-act-selection-commands-help :around #'avy-act-exit-function)
+  (advice-add 'avy-act-position-selection-help :around #'avy-act-exit-function))
 
 ;;;; Commands
 ;;;;; Commands for marking
@@ -430,7 +471,8 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-functions-help)
                      (avy-act-position-selection-help)))
   (let ((window (selected-window))
@@ -448,7 +490,7 @@ delete whitespace) and return to POS."
                       (select-window window)))))
 
 (defun avy-act-on-position-word-1 (cmd size)
-                      "Use Avy to act on a position chosen by `avy-goto-word-1'.
+  "Use Avy to act on a position chosen by `avy-goto-word-1'.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-word-1' to choose a
@@ -466,12 +508,13 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-                      (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-position-selection-help)))
-                      (avy-act-on-position cmd #'avy-goto-word-1 size))
+  (avy-act-on-position cmd #'avy-goto-word-1 size))
 
 (defun avy-act-on-position-in-line (cmd size)
-                                "Use Avy to act on a position in the current line.
+  "Use Avy to act on a position in the current line.
 
 Ask for a command CMD and a selecting function SIZE chosen using
 `avy-act-position-selection-map', then use `avy-goto-char-in-line' to choose a
@@ -489,9 +532,10 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-                                (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-position-selection-help)))
-                                (avy-act-on-position cmd #'avy-goto-char-in-line size))
+  (avy-act-on-position cmd #'avy-goto-char-in-line size))
 
 ;;;;;; Region commands
 (defun avy-act-on-region (cmd avy1 avy2)
@@ -512,7 +556,8 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-functions-help)
                      (avy-act-functions-help)))
   (let ((window (selected-window))
@@ -531,7 +576,7 @@ delete whitespace) and return to POS."
     (set-transient-map avy-act-post-action-map)))
 
 (defun avy-act-on-region-by-same-function (cmd avy)
-                        "Use Avy to act on a region.
+  "Use Avy to act on a region.
 
 Ask for a command CMD and an avy-function AVY chosen by
 `avy-act-function-map'. Use AVY to go to a position, set the mark, use AVY to
@@ -548,11 +593,10 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-                        (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-functions-help)))
-                        (avy-act-on-region cmd avy avy))
-
-
+  (avy-act-on-region cmd avy avy))
 
 ;;;;;; Act-to-point commands
 (defun avy-act-to-point (cmd avy)
@@ -573,7 +617,8 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-  (interactive (list (avy-act-selection-commands-help)
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))
                      (avy-act-functions-help)))
   (save-excursion (set-mark (point))
                   (call-interactively avy)
@@ -584,7 +629,7 @@ delete whitespace) and return to POS."
   (set-transient-map avy-act-post-action-map))
 
 (defun avy-act-to-point-in-same-line (cmd)
-    "Use Avy to act up to point in the current line.
+  "Use Avy to act up to point in the current line.
 
 Ask for a command CMD. Set the mark, use `avy-goto-char-in-line' to go to a
 position and call CMD. Return to the initial position POS.
@@ -600,8 +645,9 @@ If immediately after an action a key combination COMB in
 command is supposed to use the variables `avy-act-frame', `avy-act-window' and
 `avy-act-pos' to return to the position that was acted on, do something (mainly
 delete whitespace) and return to POS."
-    (interactive (list (avy-act-selection-commands-help)))
-    (avy-act-to-point cmd #'avy-goto-char-in-line))
+  (interactive (list (progn (avy-act--make-help-screens)
+                            (avy-act-selection-commands-help))))
+  (avy-act-to-point cmd #'avy-goto-char-in-line))
 
 (provide 'avy-act)
 ;;; avy-act.el ends here
