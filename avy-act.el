@@ -57,7 +57,12 @@
 ;; whitespace or delete a character.
 
 ;;; Code:
-;;;; Requirements
+;;;; Preamble
+(declare-function avy-act-functions-help "./avy-act.el" nil t)
+(declare-function avy-act-selection-commands-help "./avy-act.el" nil t)
+(declare-function avy-act-position-selection-help "./avy-act.el" nil t)
+(declare-function help--help-screen "help-macro.el" (help-line help-text helped-map buffer-name) t)
+
 (require 'avy)
 (require 'dired)
 (require 'eww)
@@ -66,7 +71,7 @@
 (require 'help-macro)
 
 ;;;; Keymaps
-(eval-when-compile
+(eval-and-compile
   (defvar-keymap avy-act-function-map
     :doc "Map for choosing avy-functions in avy-act commands like
   avy-select-by-same-function-and-apply and its variants."
@@ -129,16 +134,16 @@ the top, middle or bottom."
 
 ;;;; Help screens
 ;;;;; Help screen functions and macros
-(eval-when-compile(defun avy-act--prepare-keymap-for-avy-act-help-screen (map)
-                    "Prepare MAP for inclusion in an avy-act help-screen.
+(eval-and-compile(defun avy-act--prepare-keymap-for-avy-act-help-screen (map)
+                   "Prepare MAP for inclusion in an avy-act help-screen.
 This means each command bound in MAP is converted into a function that throws an
 exit-catch returning the command's name.
 Might not work for all kinds of keymaps."
-                    (mapcar (lambda (elt)
-                              (if (consp elt)
-                                  (if (keymapp elt)
-                                      (avy-act--prepare-keymap-for-avy-act-help-screen elt)
-                                    (cons (car elt) `(lambda () (interactive) (throw 'exit ',(cdr elt)))))
+                   (mapcar (lambda (elt)
+                                (if (consp elt)
+                                      (if (keymapp elt)
+                                          (avy-act--prepare-keymap-for-avy-act-help-screen elt)
+                                      (cons (car elt) `(lambda () (interactive) (throw 'exit ',(cdr elt)))))
                                 elt))
                             map)))
 
@@ -177,9 +182,9 @@ arguments."
        ,buffer-name)))
 
 (defalias 'avy-act-make-function-select-help-screen
-  (if t
-      'avy-act-make-function-select-help-screen-29
-    'avy-act-make-function-select-help-screen-30))
+      (if t
+              'avy-act-make-function-select-help-screen-29
+        'avy-act-make-function-select-help-screen-30))
 
 (defun avy-act--make-help-screens ()
   "Make help screens relevant to `avy-act'."
