@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024  Alexander Prähauser
 
 ;; Author: Alexander Prähauser <ahprae@protonmail.com>
-;; Package-Requires: ((avy "0.5.0") (back-button "0.6.8") (emacs "29.1"))
+;; Package-Requires: ((avy "0.5.0") (emacs "29.1"))
 ;; Version: 1.0
 ;; Keywords: tools, convenience
 ;; URL: https://gitlab.com/nameiwillforget/avy-act
