@@ -151,14 +151,14 @@ Might not work for all kinds of keymaps."
   "Exit FUN with an exit catch around it."
   (catch 'exit (funcall fun)))
 
-(defmacro avy-act-make-function-select-help-screen-30 (fname help-line help-text helped-map
-                                                             &optional buffer-name)
-  "A variant of `make-help-screen'.
+(defmacro avy-act-defun-name-help-screen-30 (fname help-line help-text helped-map
+                                                   &optional buffer-name)
+    "A variant of `make-help-screen'.
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
 arguments."
-  (declare (indent defun))
-  `(defun ,fname ()
+    (declare (indent defun))
+    `(defun ,fname ()
      "Help command."
      (interactive)
      (catch 'exit (help--help-screen ,help-line ,help-text
@@ -166,57 +166,57 @@ arguments."
                                       ,helped-map)
                                      ,buffer-name))))
 
-(defmacro avy-act-make-function-select-help-screen-29 (fname help-line help-text helped-map
-                                                             &optional buffer-name)
-  "A variant of `make-help-screen'.
+(defmacro avy-act-defun-name-help-screen-29 (fname help-line help-text helped-map
+                                                   &optional buffer-name)
+    "A variant of `make-help-screen'.
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
 arguments."
-  (declare (indent defun))
-  `(progn
-     (make-help-screen ,fname ,help-line ,help-text
-       ',(avy-act--prepare-keymap-for-avy-act-help-screen
+    (declare (indent defun))
+    `(progn
+       (make-help-screen ,fname ,help-line ,help-text
+         ',(avy-act--prepare-keymap-for-avy-act-help-screen
           (if (symbolp helped-map)
-              (symbol-value helped-map)
-            helped-map))
-       ,buffer-name)))
+                  (symbol-value helped-map)
+              helped-map))
+         ,buffer-name)))
 
-(defalias 'avy-act-make-function-select-help-screen
-      (if t
-              'avy-act-make-function-select-help-screen-29
-        'avy-act-make-function-select-help-screen-30))
+(defalias 'avy-act-defun-name-help-screen
+            (if t
+                          'avy-act-defun-name-help-screen-29
+              'avy-act-defun-name-help-screen-30))
 
 (defun avy-act--make-help-screens ()
-  "Make help screens relevant to `avy-act'."
-  (if (< emacs-major-version 30)
-      (progn (avy-act-make-function-select-help-screen-29
+              "Make help screens relevant to `avy-act'."
+              (if (< emacs-major-version 30)
+                              (progn (avy-act-defun-name-help-screen-29
                avy-act-functions-help "Function: (? for Help)"
                (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
                avy-act-function-map)
 
-             (avy-act-make-function-select-help-screen-29 avy-act-selection-commands-help "Function: (? for Help)"
+             (avy-act-defun-name-help-screen-29 avy-act-selection-commands-help "Function: (? for Help)"
                (format "%s"  (substitute-command-keys "\\{avy-act-selection-command-map}"))
                avy-act-selection-command-map)
 
-             (avy-act-make-function-select-help-screen-29 avy-act-position-selection-help "Function: (? for Help)"
+             (avy-act-defun-name-help-screen-29 avy-act-position-selection-help "Function: (? for Help)"
                (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
                avy-act-position-selection-map))
-    (avy-act-make-function-select-help-screen-30
+    (avy-act-defun-name-help-screen-30
       avy-act-functions-help "Function: (? for Help)"
       (format "%s" (substitute-command-keys "\\{avy-act-function-map}"))
       avy-act-function-map)
 
-    (avy-act-make-function-select-help-screen-30 avy-act-selection-commands-help "Function: (? for Help)"
+    (avy-act-defun-name-help-screen-30 avy-act-selection-commands-help "Function: (? for Help)"
       (format "%s"  (substitute-command-keys "\\{avy-act-selection-command-map}"))
       (make-composed-keymap avy-act-selection-command-map (make-composed-keymap (current-active-maps t))))
 
-    (avy-act-make-function-select-help-screen-30 avy-act-position-selection-help "Function: (? for Help)"
+    (avy-act-defun-name-help-screen-30 avy-act-position-selection-help "Function: (? for Help)"
       (format "%s"  (substitute-command-keys "\\{avy-act-position-selection-map}"))
       avy-act-position-selection-map))
 
-  (advice-add 'avy-act-functions-help :around #'avy-act-exit-function)
-  (advice-add 'avy-act-selection-commands-help :around #'avy-act-exit-function)
-  (advice-add 'avy-act-position-selection-help :around #'avy-act-exit-function))
+              (advice-add 'avy-act-functions-help :around #'avy-act-exit-function)
+              (advice-add 'avy-act-selection-commands-help :around #'avy-act-exit-function)
+              (advice-add 'avy-act-position-selection-help :around #'avy-act-exit-function))
 
 ;;;; Commands
 ;;;;; Commands for marking
@@ -300,9 +300,9 @@ If a prefix ARG is given, delete the character after."
         ((derived-mode-p 'dired-mode)
          (call-interactively #'dired-display-file))
         ((derived-mode-p 'help-mode)
-         (progn (clone-buffer)
-                (call-interactively #'push-button)))
-        (t (progn (org-open-at-point-global)))))
+         (clone-buffer)
+         (call-interactively #'push-button))
+        (t (org-open-at-point-global))))
 
 (defun avy-act-follow ()
   "This command jumps to and opens a link using avy-act-follow-word-1."
