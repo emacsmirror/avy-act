@@ -169,9 +169,13 @@ arguments."
 (defmacro avy-act-defun-name-help-screen-29 (fname help-line help-text helped-map
                                                    &optional buffer-name)
     "A variant of `make-help-screen'.
+
 There is only difference to the original macro: instead of calling a selected
 function it returns its name. See `make-help-screen' for an explanation of the
-arguments."
+arguments.
+
+Note that, unlike with `avy-act-defun-make-help-screen-30', it is not possible
+to choose commands that are not in the `avy-act-selection-command-map'."
     (declare (indent defun))
     `(progn
        (make-help-screen ,fname ,help-line ,help-text
@@ -465,8 +469,10 @@ Ask for a command CMD, an avy function AVY as chosen using the
 position, and then apply SIZE to mark a region and call CMD. Return to the
 initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -502,8 +508,11 @@ Ask for a command CMD and a selecting function SIZE chosen using
 position, and then apply SIZE to mark a region and call CMD. Return to the
 initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -526,8 +535,11 @@ Ask for a command CMD and a selecting function SIZE chosen using
 position, and then apply SIZE to mark a region and call CMD. Return to the
 initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -550,8 +562,11 @@ Ask for a command CMD and two avy-functions AVY1 and AVY2 chosen by
 `avy-act-function-map'. Use AVY1 to go to a position, set the mark, use AVY2 to
 go to another position and call CMD. Return to the initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -587,8 +602,10 @@ Ask for a command CMD and an avy-function AVY chosen by
 `avy-act-function-map'. Use AVY to go to a position, set the mark, use AVY to
 go to another position and call CMD. Return to the initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -611,8 +628,10 @@ Ask for a command CMD and an avy-function AVY chosen by `avy-act-function-map'.
 Set the mark, use AVY to go to a position and call CMD. Return to the initial
 position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
@@ -639,8 +658,10 @@ delete whitespace) and return to POS."
 Ask for a command CMD. Set the mark, use `avy-goto-char-in-line' to go to a
 position and call CMD. Return to the initial position POS.
 
-CMD is chosen through typing a key combination that is either in the currently
-active maps or in the `avy-position-command-map', which overrides the others.
+CMD is chosen through typing a key combination that is in the
+`avy-position-command-map'. In Emacs 30 and up you can also use any other bound
+key combination that is not overwritten by one in the
+`avy-position-command-map'.
 
 Through this method, simple editing of areas before or after point can be done
 without having to move point.
