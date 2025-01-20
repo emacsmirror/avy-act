@@ -30,8 +30,6 @@ For this, another command can be applied to that position from the
 delete a character.
 
 # Installation
-For now, just clone `avy-act` into `~/.emacs.d/site-lisp/` and add 
-```
-(add-to-list `load-path (expand-file-name "site-lisp/avy-act/" user-emacs-directory))
-```
-to your init. Adapt to your local setup if you are using different folders.
+Avy-Act is in Melpa. You can install it from there. Otherwise, just clone the
+repository, put it into your file path, byte-compile it and add `(require
+'avy-act)` to your init.
