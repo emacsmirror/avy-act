@@ -186,9 +186,9 @@ to choose commands that are not in the `avy-act-selection-command-map'."
          ,buffer-name)))
 
 (defalias 'avy-act-defun-name-help-screen
-            (if t
-                          'avy-act-defun-name-help-screen-29
-              'avy-act-defun-name-help-screen-30))
+  (if (< emacs-major-version 30)
+      'avy-act-defun-name-help-screen-29
+    'avy-act-defun-name-help-screen-30))
 
 (defun avy-act--make-help-screens ()
               "Make help screens relevant to `avy-act'."
