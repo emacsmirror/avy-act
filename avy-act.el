@@ -304,7 +304,7 @@ If a prefix ARG is given, delete the character after."
         ((derived-mode-p 'dired-mode)
          (call-interactively #'dired-display-file))
         ((derived-mode-p 'help-mode)
-         (clone-buffer)
+         (switch-to-buffer (clone-buffer))
          (call-interactively #'push-button))
         (t (org-open-at-point-global))))
 
